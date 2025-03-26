@@ -6,3 +6,5 @@ Going to investigate the relative performance of single task vs multittask XGBoo
 # Data
 
 Start with ENB [dataset](https://openml.org/search?type=data&status=active&id=41478&sort=runs)
+
+Try JURA [dataset](https://www.openml.org/search?type=data&status=active&id=41554)
