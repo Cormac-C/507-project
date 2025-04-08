@@ -10,6 +10,11 @@ from tabpfn import TabPFNRegressor
 from typing import Tuple, Literal
 import itertools
 from tqdm import tqdm
+import logging
+
+from utils import clipped_norm
+
+logger = logging.getLogger(__name__)
 
 Multi_Task_Strategy = Literal["multi_output_tree", "one_output_per_tree"]
 
@@ -125,7 +130,7 @@ def hp_xg_boost_single_task(
     learning_rate_values: list[float] = [1e-1, 1e-2, 1e-3],
     verbose: bool = False,
 ) -> Tuple[dict[str, float], dict[str, int], pd.DataFrame]:
-    best_r2 = -1
+    best_r2 = 0
     best_metrics = None
     best_hps = None
     full_results = []
@@ -177,7 +182,7 @@ def hp_xg_boost_multi_task(
     ],
     verbose: bool = False,
 ) -> Tuple[dict[str, float], dict[str, int], pd.DataFrame]:
-    best_r2 = -1
+    best_r2 = 0
     best_metrics = None
     best_hps = None
     full_results = []
@@ -189,7 +194,7 @@ def hp_xg_boost_multi_task(
         * len(multi_task_strategies)
     )
     if verbose:
-        print(f"Starting HP search with {num_combinations} combinations")
+        logger.info(f"Starting HP search with {num_combinations} combinations")
     for num_est, max_depth, lr, strategy in tqdm(
         itertools.product(
             n_estimators_values,
@@ -200,7 +205,7 @@ def hp_xg_boost_multi_task(
         total=num_combinations,
     ):
         if verbose:
-            print(
+            logger.info(
                 f"Training with n_estimators={num_est}, max_depth={max_depth}, learning_rate={lr}"
             )
         _, _, _, average_mse, average_r2 = train_xgboost_multi_task(
@@ -209,7 +214,7 @@ def hp_xg_boost_multi_task(
         full_results.append(
             (num_est, max_depth, lr, strategy, *average_mse, *average_r2)
         )
-        if LA.norm(average_r2) > LA.norm(best_r2):
+        if clipped_norm(average_r2) > clipped_norm(best_r2):
             best_r2 = average_r2
             best_metrics = {"MSE": average_mse, "R2": average_r2}
             best_hps = {"num_est": num_est, "max_d": max_depth, "lr": lr}
