@@ -13,7 +13,7 @@ def xg_boost_trial(
     normalize: bool = True,
     cross_validation_k: int = 5,
     multi_task: bool = False,
-    n_estimators_values: list[int] = [10, 50, 100, 500, 1000],
+    n_estimators_values: list[int] = [10, 50, 100, 500, 1000, 3000],
     max_depth_values: list[int] = [1, 2, 3, 5],
     learning_rate_values: list[float] = [1e-1, 1e-2, 1e-3],
     verbose: bool = False,
